@@ -31,6 +31,7 @@ jobs:
         run: scripts/install-dart.sh
       - name: Analyze Dart and run VM tests
         run: |
+          .tools/dart-sdk/bin/dart pub get
           .tools/dart-sdk/bin/dart analyze
           .tools/dart-sdk/bin/dart test -r expanded
       - name: Compile Dart to JavaScript and assemble the book
