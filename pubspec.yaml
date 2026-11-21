@@ -1,0 +1,10 @@
+name: lmdart
+description: Direct DOM, SVG, Canvas, charts, tweening, and WebGL for Dart in the browser.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: '>=3.14.1 <4.0.0'
+dependencies:
+  web: 1.1.1
+dev_dependencies:
+  test: 1.26.3

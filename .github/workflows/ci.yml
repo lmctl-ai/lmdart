@@ -1,0 +1,43 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.15
+      - name: Check generated pages
+        run: |
+          python3 scripts/generate-book.py
+          git diff --exit-code
+      - name: Install checksum-pinned Dart SDK
+        run: scripts/install-dart.sh
+      - name: Analyze Dart and run VM tests
+        run: |
+          .tools/dart-sdk/bin/dart analyze
+          .tools/dart-sdk/bin/dart test -r expanded
+      - name: Compile Dart to JavaScript and assemble the book
+        run: bash scripts/build.sh
+      - name: Install browser test dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Test every production demo chapter
+        run: npm test
